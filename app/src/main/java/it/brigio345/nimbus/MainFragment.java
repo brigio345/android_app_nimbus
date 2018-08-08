@@ -78,11 +78,13 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment, container, false);
-
-        ListView listView = view.findViewById(R.id.listview);
+        ListView listView = new ListView(getContext());
+        listView.setNestedScrollingEnabled(true);
+        listView.setDivider(null);
+        listView.setVerticalScrollBarEnabled(false);
+        listView.setHorizontalScrollBarEnabled(false);
         listView.setAdapter(new ListAdapter(getContext(), content));
 
-        return view;
+        return listView;
     }
 }

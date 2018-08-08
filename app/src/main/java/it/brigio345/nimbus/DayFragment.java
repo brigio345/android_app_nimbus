@@ -135,11 +135,13 @@ public class DayFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment, container, false);
+        ListView listView = new ListView(getContext());
+        listView.setNestedScrollingEnabled(true);
+        listView.setDivider(null);
+        listView.setVerticalScrollBarEnabled(false);
+        listView.setHorizontalScrollBarEnabled(false);
+        listView.setAdapter(new ListAdapter(getContext(), content));
 
-        ListView listView = view.findViewById(R.id.listview);
-        listView.setAdapter(new ListAdapter(getActivity(), content));
-
-        return view;
+        return listView;
     }
 }
