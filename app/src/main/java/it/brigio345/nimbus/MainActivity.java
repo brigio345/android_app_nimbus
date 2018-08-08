@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -172,8 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
                         pagerAdapter.notifyDataSetChanged();
 
-                        ((ConstraintLayout) findViewById(R.id.constraint_layout_main))
-                                .removeView(findViewById(R.id.progressbar_main));
+                        findViewById(R.id.progressbar_main).setVisibility(View.INVISIBLE);
                     }
                 });
             } catch (IOException e) {
@@ -253,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 } else {
+                    findViewById(R.id.progressbar_main).setVisibility(View.VISIBLE);
                     download.start();
                 }
 
