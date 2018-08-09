@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import java.util.ArrayList;
-
 import it.brigio345.nimbus.adapters.DayListAdapter;
 
 public class DayFragment extends Fragment {
@@ -18,7 +16,7 @@ public class DayFragment extends Fragment {
     private static final String VENTI = "venti";
     private static final String TEMPERATURE = "temperature";
 
-    private ArrayList<String> content;
+    private String[] content;
 
     public DayFragment() {
         // Required empty public constructor
@@ -50,11 +48,11 @@ public class DayFragment extends Fragment {
         Bundle args = getArguments();
 
         if (args != null) {
-            content = new ArrayList<>(4);
-            content.add(args.getString(PRECIPITAZIONI));
-            content.add(args.getString(CIELO));
-            content.add(args.getString(TEMPERATURE));
-            content.add(args.getString(VENTI));
+            content = new String[4];
+            content[0] = args.getString(PRECIPITAZIONI);
+            content[1] = args.getString(CIELO);
+            content[2] = args.getString(TEMPERATURE);
+            content[3] = args.getString(VENTI);
         }
     }
 

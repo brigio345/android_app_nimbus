@@ -7,19 +7,16 @@ import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
-
-import java.util.ArrayList;
 
 import it.brigio345.nimbus.R;
 
-public class DayListAdapter extends ArrayAdapter<String> {
+public class DayListAdapter extends BaseAdapter {
     private final Context context;
-    private final ArrayList<String> content;
+    private final String[] content;
 
-    public DayListAdapter(Context context, ArrayList<String> content) {
-        super(context, 0, content);
+    public DayListAdapter(Context context, String[] content) {
         this.context = context;
         this.content = content;
     }
@@ -33,7 +30,7 @@ public class DayListAdapter extends ArrayAdapter<String> {
         }
 
         TextView textView = convertView.findViewById(R.id.textview_dayitem_content);
-        textView.setText(content.get(position));
+        textView.setText(content[position]);
 
         Resources resources = context.getResources();
 
@@ -77,6 +74,16 @@ public class DayListAdapter extends ArrayAdapter<String> {
                 .setCardBackgroundColor(color);
 
         return convertView;
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return content[position];
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override
