@@ -206,8 +206,26 @@ public class MainActivity extends AppCompatActivity {
         ViewPager viewPager = findViewById(R.id.viewpager_main);
         viewPager.setAdapter(pagerAdapter);
 
-        int default_region = sharedPref.getInt("DEFAULT_REGION", Context.MODE_PRIVATE);
-        spinner.setSelection(default_region);
+        Intent intent = getIntent();
+
+        boolean region_selected = false;
+
+        if (intent != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
+            String path = intent.getData().getPath();
+
+            if (path != null) {
+                if (path.equals(getString(R.string.piemonte_url_path))) {
+                    spinner.setSelection(0);
+                    region_selected = true;
+                } else if (path.equals(getString(R.string.lombardia_url_path))) {
+                    spinner.setSelection(1);
+                    region_selected = true;
+                }
+            }
+        }
+
+        if (!region_selected)
+            spinner.setSelection(sharedPref.getInt("DEFAULT_REGION", Context.MODE_PRIVATE));
     }
 
     @Override
