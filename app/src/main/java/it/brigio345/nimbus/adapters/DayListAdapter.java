@@ -1,8 +1,8 @@
 package it.brigio345.nimbus.adapters;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,32 +32,30 @@ public class DayListAdapter extends BaseAdapter {
         TextView textView = convertView.findViewById(R.id.textview_dayitem_content);
         textView.setText(content[position]);
 
-        Resources resources = context.getResources();
-
         int color;
         String title;
 
         switch (position) {
             case 0:
-                color = resources.getColor(R.color.colorPrecipitazioni);
+                color = ContextCompat.getColor(context, R.color.colorPrecipitazioni);
                 title = context.getString(R.string.precipitazioni);
 
                 break;
 
             case 1:
-                color = resources.getColor(R.color.colorCielo);
+                color = ContextCompat.getColor(context, R.color.colorCielo);
                 title = context.getString(R.string.cielo);
 
                 break;
 
             case 2:
-                color = resources.getColor(R.color.colorTemperature);
+                color = ContextCompat.getColor(context, R.color.colorTemperature);
                 title = context.getString(R.string.temperature);
 
                 break;
 
             case 3:
-                color = resources.getColor(R.color.colorVenti);
+                color = ContextCompat.getColor(context, R.color.colorVenti);
                 title = context.getString(R.string.venti);
 
                 break;
