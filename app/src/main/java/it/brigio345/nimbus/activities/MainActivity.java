@@ -38,8 +38,6 @@ import it.brigio345.nimbus.utils.DateConverter;
 import it.brigio345.nimbus.R;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String PIEMONTE_URL = "http://www.nimbus.it/italiameteo/previpiemonte.htm";
-    private static final String LOMBARDIA_URL = "http://www.nimbus.it/italiameteo/previlombardia.htm";
     private String url;
     private Elements content;
     private Elements days;
@@ -57,15 +55,15 @@ public class MainActivity extends AppCompatActivity {
 
             switch (id) {
                 case 0:
-                    url = PIEMONTE_URL;
+                    url = getString(R.string.piemonte_url);
                     break;
 
                 case 1:
-                    url = LOMBARDIA_URL;
+                    url = getString(R.string.lombardia_url);
                     break;
 
                 default:
-                    url = PIEMONTE_URL;
+                    url = getString(R.string.piemonte_url);
             }
 
             try {
@@ -255,14 +253,10 @@ public class MainActivity extends AppCompatActivity {
                                     StringBuilder builder = new StringBuilder();
 
                                     builder.append(getString(R.string.share_intro));
-                                    builder.append(" (");
 
-                                    if (url.equals(PIEMONTE_URL))
-                                        builder.append(getString(R.string.piemonte));
-                                    else
-                                        builder.append(getString(R.string.lombardia));
+                                    builder.append(url);
 
-                                    builder.append(")\n\n");
+                                    builder.append("\n\n");
 
                                     for (int it : mSelectedItems) {
                                         builder.append(pagerAdapter.getPageTitle(it));

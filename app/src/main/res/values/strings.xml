@@ -1,13 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Nimbus</string>
-
     <string name="situazione_meteorologica">La situazione meteorologica</string>
+    <string name="oggi">Oggi</string>
+    <string name="domani">Domani</string>
     <string name="precipitazioni">Precipitazioni</string>
     <string name="cielo">Cielo</string>
     <string name="temperature">Temperature</string>
     <string name="venti">Venti</string>
-    <string name="oggi">Oggi</string>
-    <string name="domani">Domani</string>
     <string name="no_connection">Connessione non disponibile</string>
     <string name="no_connection_message">Connettiti ad Internet e riprova</string>
     <string name="try_again">Riprova</string>
@@ -15,12 +14,12 @@
     <string name="share_forecast">Condividi previsioni</string>
     <string name="ok" tools:ignore="ButtonCase,Typos">Ok</string>
     <string name="cancel">Annulla</string>
-    <string name="piemonte">Piemonte</string>
-    <string name="lombardia">Lombardia</string>
+    <string name="piemonte_url">http://www.nimbus.it/italiameteo/previpiemonte.htm</string>
+    <string name="lombardia_url">http://www.nimbus.it/italiameteo/previlombardia.htm</string>
     <string-array name="regions">
         <item>Piemonte e V.d\'Aosta</item>
         <item>Lombardia</item>
     </string-array>
-    <string name="share_intro">"Previsioni meteo di nimbus.it"</string>
+    <string name="share_intro">"Previsioni meteo Nimbus\nFonte: "</string>
     <string name="share_closing">Applicazione sviluppata da brigio345</string>
 </resources>
