@@ -1,4 +1,4 @@
-package it.brigio345.nimbus;
+package it.brigio345.nimbus.activities;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -8,10 +8,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -37,72 +33,17 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
+import it.brigio345.nimbus.adapters.MainPagerAdapter;
+import it.brigio345.nimbus.utils.DateConverter;
+import it.brigio345.nimbus.R;
+
 public class MainActivity extends AppCompatActivity {
     private static final String PIEMONTE_URL = "http://www.nimbus.it/italiameteo/previpiemonte.htm";
     private static final String LOMBARDIA_URL = "http://www.nimbus.it/italiameteo/previlombardia.htm";
     private String url;
     private Elements content;
     private Elements days;
-    private CustomPagerAdapter pagerAdapter;
-
-    private class CustomPagerAdapter extends FragmentStatePagerAdapter {
-        private List<Fragment> fragments;
-        private List<String> tabTitles;
-        private List<String> tabContents;
-
-        CustomPagerAdapter(FragmentManager fm) {
-            super(fm);
-            initializeAdapter();
-        }
-
-        @Override
-        public Fragment getItem (int position) {
-            return fragments.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return fragments.size();
-        }
-
-        @Override
-        public int getItemPosition(@NonNull Object object) {
-            return POSITION_NONE;
-        }
-
-        void addMainPage(String title, String content) {
-            tabTitles.add(title);
-            tabContents.add(content);
-
-            fragments.add(MainFragment.newInstance(content));
-        }
-
-        void addPage(String title, String content) {
-            tabTitles.add(title);
-            tabContents.add(content);
-
-            fragments.add(DayFragment.newInstance(content));
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return tabTitles.get(position);
-        }
-
-        CharSequence[] getPageTitles() {
-            return tabTitles.toArray(new CharSequence[tabTitles.size()]);
-        }
-
-        String getPageContent(int position) {
-            return tabContents.get(position);
-        }
-
-        void initializeAdapter() {
-            fragments = new LinkedList<>();
-            tabTitles = new LinkedList<>();
-            tabContents = new LinkedList<>();
-        }
-    }
+    private MainPagerAdapter pagerAdapter;
 
     private class DownloadData implements Runnable {
         private final int id;
@@ -263,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        pagerAdapter = new CustomPagerAdapter(getSupportFragmentManager());
+        pagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.viewpager_main);
         viewPager.setAdapter(pagerAdapter);
 
@@ -296,7 +237,8 @@ public class MainActivity extends AppCompatActivity {
                         .setMultiChoiceItems(pagerAdapter.getPageTitles(), null,
                                 new DialogInterface.OnMultiChoiceClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                                    public void onClick(DialogInterface dialog, int which,
+                                                        boolean isChecked) {
                                         if (isChecked)
                                             mSelectedItems.add(which);
 

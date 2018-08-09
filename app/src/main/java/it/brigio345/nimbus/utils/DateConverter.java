@@ -1,10 +1,10 @@
-package it.brigio345.nimbus;
+package it.brigio345.nimbus.utils;
 
 import java.util.GregorianCalendar;
 
-class DateConverter {
-    private static final String[] MONTHS = {"GENNAIO", "FEBBRAIO", "MARZO", "APRILE", "MAGGIO", "GIUGNO",
-            "LUGLIO", "AGOSTO", "SETTEMBRE", "OTTOBRE", "NOVEMBRE", "DICEMBRE"};
+public class DateConverter {
+    private static final String[] MONTHS = {"GENNAIO", "FEBBRAIO", "MARZO", "APRILE", "MAGGIO",
+            "GIUGNO", "LUGLIO", "AGOSTO", "SETTEMBRE", "OTTOBRE", "NOVEMBRE", "DICEMBRE"};
 
     public static GregorianCalendar convertDate(String stringDate) {
         String[] strings = stringDate.split(" ");

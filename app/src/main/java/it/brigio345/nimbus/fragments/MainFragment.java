@@ -1,56 +1,17 @@
-package it.brigio345.nimbus;
+package it.brigio345.nimbus.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
+
+import it.brigio345.nimbus.adapters.MainListAdapter;
 
 
 public class MainFragment extends Fragment {
-    private class ListAdapter extends BaseAdapter {
-        private final Context context;
-        private final String content;
-
-        ListAdapter(Context context, String content) {
-            this.context = context;
-            this.content = content;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = LayoutInflater.from(context)
-                        .inflate(R.layout.item_main, parent, false);
-            }
-
-            TextView textView = convertView.findViewById(R.id.textview_mainitem);
-            textView.setText(content);
-
-            return convertView;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return content;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public int getCount() {
-            return 1;
-        }
-    }
-
     private static final String CONTENT = "content";
 
     private String content;
@@ -83,7 +44,7 @@ public class MainFragment extends Fragment {
         listView.setDivider(null);
         listView.setVerticalScrollBarEnabled(false);
         listView.setHorizontalScrollBarEnabled(false);
-        listView.setAdapter(new ListAdapter(getContext(), content));
+        listView.setAdapter(new MainListAdapter(getContext(), content));
 
         return listView;
     }
