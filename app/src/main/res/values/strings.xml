@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Nimbus</string>
 
     <string name="situazione_meteorologica">La situazione meteorologica</string>
@@ -13,7 +13,7 @@
     <string name="try_again">Riprova</string>
     <string name="open_in_browser">Apri nel browser</string>
     <string name="share_forecast">Condividi previsioni</string>
-    <string name="ok">Ok</string>
+    <string name="ok" tools:ignore="ButtonCase,Typos">Ok</string>
     <string name="cancel">Annulla</string>
     <string name="piemonte">Piemonte</string>
     <string name="lombardia">Lombardia</string>
