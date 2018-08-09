@@ -54,10 +54,6 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
 
             switch (id) {
-                case 0:
-                    url = getString(R.string.piemonte_url);
-                    break;
-
                 case 1:
                     url = getString(R.string.lombardia_url);
                     break;
