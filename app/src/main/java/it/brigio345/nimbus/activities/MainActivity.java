@@ -77,28 +77,27 @@ public class MainActivity extends AppCompatActivity {
                                 content.get(0).text());
 
                         String day;
-                        Calendar current = Calendar.getInstance();
+                        Calendar today = Calendar.getInstance();
 
                         int size = content.size();
-                        int cmp;
-                        boolean TODAY_PRINTED = false;
-                        boolean TOMORROW_PRINTED = false;
+                        boolean todaySet = false;
+                        boolean tomorrowSet = false;
 
                         for (int i = 1, j = 6; i < size; i++, j++) {
                             day = days.get(j).text();
-                            cmp = DateConverter.convertDate(day).compareTo(current);
 
-                            if (cmp < 0)
+                            // if the date is older than "today", don't add to tabs
+                            if (DateConverter.convertDate(day).compareTo(today) < 0)
                                 continue;
 
-                            if (!TODAY_PRINTED) {
-                                day = getString(R.string.oggi);
-                                TODAY_PRINTED = true;
-                            } else if (!TOMORROW_PRINTED) {
-                                day = getString(R.string.domani);
-                                TOMORROW_PRINTED = true;
-                            } else {
+                            if (tomorrowSet) {
                                 day = day.replaceFirst("\\s[\\d]{4}", ""); // removes the year
+                            } else if (todaySet) {
+                                day = getString(R.string.domani);
+                                tomorrowSet = true;
+                            } else {
+                                day = getString(R.string.oggi);
+                                todaySet = true;
                             }
 
                             pagerAdapter.addPage(day, content.get(i).text());
@@ -122,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(null);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = sharedPref.edit();
@@ -139,55 +138,51 @@ public class MainActivity extends AppCompatActivity {
 
                 final Thread download = new Thread(new DownloadData(position));
 
-                if (activeNetwork == null || !activeNetwork.isConnectedOrConnecting()) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final AlertDialog alert = new AlertDialog.Builder(context)
-                                    .setTitle(R.string.no_connection)
-                                    .setMessage(R.string.no_connection_message)
-                                    .setCancelable(false)
-                                    .setPositiveButton(R.string.try_again, null)
-                                    .create();
-
-                            alert.setOnShowListener(new DialogInterface.OnShowListener() {
-
-                                @Override
-                                public void onShow(DialogInterface dialogInterface) {
-                                    Button button = alert.getButton(AlertDialog.BUTTON_POSITIVE);
-                                    button.setOnClickListener(new View.OnClickListener() {
-
-                                        @Override
-                                        public void onClick(View view) {
-                                            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-
-                                            if (activeNetwork != null &&
-                                                    activeNetwork.isConnectedOrConnecting()) {
-                                                download.start();
-                                                alert.dismiss();
-                                            }
-                                        }
-                                    });
-                                }
-                            });
-
-                            alert.setOnKeyListener(new Dialog.OnKeyListener() {
-                                @Override
-                                public boolean onKey(DialogInterface arg0, int keyCode,
-                                                     KeyEvent event) {
-                                    if (keyCode == KeyEvent.KEYCODE_BACK)
-                                        finish();
-
-                                    return false;
-                                }
-                            });
-
-                            alert.show();
-                        }
-                    });
-                } else {
+                if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
                     findViewById(R.id.progressbar_main).setVisibility(View.VISIBLE);
                     download.start();
+                } else {
+                    final AlertDialog alert = new AlertDialog.Builder(context)
+                            .setTitle(R.string.no_connection)
+                            .setMessage(R.string.no_connection_message)
+                            .setCancelable(false)
+                            .setPositiveButton(R.string.try_again, null)
+                            .create();
+
+                    alert.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                        @Override
+                        public void onShow(DialogInterface dialogInterface) {
+                            Button button = alert.getButton(AlertDialog.BUTTON_POSITIVE);
+                            button.setOnClickListener(new View.OnClickListener() {
+
+                                @Override
+                                public void onClick(View view) {
+                                    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+                                    if (activeNetwork != null &&
+                                            activeNetwork.isConnectedOrConnecting()) {
+                                        download.start();
+                                        alert.dismiss();
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                    // without this, pressing back button would have no effect
+                    alert.setOnKeyListener(new Dialog.OnKeyListener() {
+                        @Override
+                        public boolean onKey(DialogInterface arg0, int keyCode,
+                                             KeyEvent event) {
+                            if (keyCode == KeyEvent.KEYCODE_BACK)
+                                finish();
+
+                            return false;
+                        }
+                    });
+
+                    alert.show();
                 }
 
                 editor.putInt("DEFAULT_REGION", position);

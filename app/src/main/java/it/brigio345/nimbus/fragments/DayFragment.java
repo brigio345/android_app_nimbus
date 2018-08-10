@@ -1,5 +1,6 @@
 package it.brigio345.nimbus.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -59,12 +60,14 @@ public class DayFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ListView listView = new ListView(getContext());
+        Context context = getContext();
+
+        ListView listView = new ListView(context);
+
         listView.setNestedScrollingEnabled(true);
         listView.setDivider(null);
         listView.setVerticalScrollBarEnabled(false);
-        listView.setHorizontalScrollBarEnabled(false);
-        listView.setAdapter(new DayListAdapter(getContext(), content));
+        listView.setAdapter(new DayListAdapter(context, content));
 
         return listView;
     }
