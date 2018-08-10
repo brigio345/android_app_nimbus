@@ -6,10 +6,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+import android.widget.TextView;
 
-import it.brigio345.nimbus.adapters.MainListAdapter;
-
+import it.brigio345.nimbus.R;
 
 public class MainFragment extends Fragment {
     private static final String CONTENT = "content";
@@ -39,13 +38,9 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ListView listView = new ListView(getContext());
-        listView.setNestedScrollingEnabled(true);
-        listView.setDivider(null);
-        listView.setVerticalScrollBarEnabled(false);
-        listView.setHorizontalScrollBarEnabled(false);
-        listView.setAdapter(new MainListAdapter(getContext(), content));
+        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        ((TextView) view.findViewById(R.id.textview_mainitem)).setText(content);
 
-        return listView;
+        return view;
     }
 }
