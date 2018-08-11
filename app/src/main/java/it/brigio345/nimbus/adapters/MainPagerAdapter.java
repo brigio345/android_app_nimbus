@@ -18,7 +18,10 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
 
     public MainPagerAdapter(FragmentManager fm) {
         super(fm);
-        initializeAdapter();
+
+        fragments = new LinkedList<>();
+        tabTitles = new LinkedList<>();
+        tabContents = new LinkedList<>();
     }
 
     @Override
@@ -63,9 +66,9 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
         return tabContents.get(position);
     }
 
-    public void initializeAdapter() {
-        fragments = new LinkedList<>();
-        tabTitles = new LinkedList<>();
-        tabContents = new LinkedList<>();
+    public void clear() {
+        fragments.clear();
+        tabTitles.clear();
+        tabContents.clear();
     }
 }

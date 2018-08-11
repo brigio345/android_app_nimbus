@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 content = document.getElementsByAttributeValue("class", "MsoNormal");
                 days = document.getElementsByTag("table");
 
-                pagerAdapter.initializeAdapter();
+                pagerAdapter.clear();
 
                 runOnUiThread(new Runnable() {
                     @Override
