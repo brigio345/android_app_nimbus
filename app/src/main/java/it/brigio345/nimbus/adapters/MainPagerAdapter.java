@@ -39,18 +39,14 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
         return POSITION_NONE;
     }
 
-    public void addMainPage(String title, String content) {
+    public void addPage(String title, String content, boolean isMain) {
         tabTitles.add(title);
         tabContents.add(content);
 
-        fragments.add(MainFragment.newInstance(content));
-    }
-
-    public void addPage(String title, String content) {
-        tabTitles.add(title);
-        tabContents.add(content);
-
-        fragments.add(DayFragment.newInstance(content));
+        if (!isMain)
+            fragments.add(DayFragment.newInstance(content));
+        else
+            fragments.add(MainFragment.newInstance(content));
     }
 
     @Override
