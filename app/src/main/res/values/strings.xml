@@ -22,6 +22,6 @@
         <item>Piemonte e V.d\'Aosta</item>
         <item>Lombardia</item>
     </string-array>
-    <string name="share_intro">"Previsioni meteo Nimbus\nFonte: "</string>
+    <string name="share_intro">Previsioni meteo Nimbus\nFonte: </string>
     <string name="share_closing">Applicazione sviluppata da brigio345</string>
 </resources>
