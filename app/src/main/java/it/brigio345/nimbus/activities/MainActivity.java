@@ -278,7 +278,8 @@ public class MainActivity extends AppCompatActivity {
 
                                     sendIntent.putExtra(Intent.EXTRA_TEXT, builder.toString());
                                     sendIntent.setType("text/plain");
-                                    startActivity(sendIntent);
+                                    startActivity(Intent.createChooser(sendIntent,
+                                            getString(R.string.share_forecast)));
                                 }
                             }
                         })
