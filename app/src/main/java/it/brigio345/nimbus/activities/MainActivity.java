@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private Elements content;
     private Elements days;
     private MainPagerAdapter pagerAdapter;
+    private ViewPager viewPager;
 
     private class DownloadData implements Runnable {
         private final int id;
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         pagerAdapter.notifyDataSetChanged();
+                        viewPager.setCurrentItem(0);
 
                         findViewById(R.id.progressbar_main).setVisibility(View.INVISIBLE);
                     }
@@ -194,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         pagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
-        ViewPager viewPager = findViewById(R.id.viewpager_main);
+        viewPager = findViewById(R.id.viewpager_main);
         viewPager.setAdapter(pagerAdapter);
 
         Intent intent = getIntent();
