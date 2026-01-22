@@ -14,9 +14,9 @@
     <string name="share_forecast">Condividi previsioni</string>
     <string name="ok" tools:ignore="ButtonCase,Typos">Ok</string>
     <string name="cancel">Annulla</string>
-    <string name="piemonte_url">http://www.nimbus.it/italiameteo/previpiemonte.htm</string>
+    <string name="piemonte_url">https://www.nimbus.it/italiameteo/previpiemonte.htm</string>
     <string name="piemonte_url_path">/italiameteo/previpiemonte.htm</string>
-    <string name="lombardia_url">http://www.nimbus.it/italiameteo/previlombardia.htm</string>
+    <string name="lombardia_url">https://www.nimbus.it/italiameteo/previlombardia.htm</string>
     <string name="lombardia_url_path">/italiameteo/previlombardia.htm</string>
     <string-array name="regions">
         <item>Piemonte e V.d\'Aosta</item>
