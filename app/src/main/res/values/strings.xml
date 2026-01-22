@@ -16,12 +16,6 @@
     <string name="cancel">Annulla</string>
     <string name="piemonte_url">https://www.nimbus.it/italiameteo/previpiemonte.htm</string>
     <string name="piemonte_url_path">/italiameteo/previpiemonte.htm</string>
-    <string name="lombardia_url">https://www.nimbus.it/italiameteo/previlombardia.htm</string>
-    <string name="lombardia_url_path">/italiameteo/previlombardia.htm</string>
-    <string-array name="regions">
-        <item>Piemonte e V.d\'Aosta</item>
-        <item>Lombardia</item>
-    </string-array>
     <string name="share_intro">Previsioni meteo Nimbus\nFonte: </string>
     <string name="share_closing">Applicazione sviluppata da brigio345</string>
 </resources>

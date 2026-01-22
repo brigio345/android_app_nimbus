@@ -48,23 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
 
     private class DownloadData implements Runnable {
-        private final int id;
-
-        DownloadData(int id) {
-            this.id = id;
-        }
-
         @Override
         public void run() {
-
-            switch (id) {
-                case 1:
-                    url = getString(R.string.lombardia_url);
-                    break;
-
-                default:
-                    url = getString(R.string.piemonte_url);
-            }
+            url = getString(R.string.piemonte_url);
 
             try {
                 InputStream inStream = new URL(url).openStream();
@@ -136,102 +122,65 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        final SharedPreferences.Editor editor = sharedPref.edit();
 
         final Context context = this;
 
-        Spinner spinner = findViewById(R.id.spinner_main_regions);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                final ConnectivityManager cm = (ConnectivityManager) getSystemService(
-                        Context.CONNECTIVITY_SERVICE);
-                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        final ConnectivityManager cm = (ConnectivityManager) getSystemService(
+                Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 
-                final Thread download = new Thread(new DownloadData(position));
+        final Thread download = new Thread(new DownloadData());
 
-                if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
-                    findViewById(R.id.progressbar_main).setVisibility(View.VISIBLE);
-                    download.start();
-                } else {
-                    final AlertDialog alert = new AlertDialog.Builder(context)
-                            .setTitle(R.string.no_connection)
-                            .setMessage(R.string.no_connection_message)
-                            .setCancelable(false)
-                            .setPositiveButton(R.string.try_again, null)
-                            .create();
+        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
+            findViewById(R.id.progressbar_main).setVisibility(View.VISIBLE);
+            download.start();
+        } else {
+            final AlertDialog alert = new AlertDialog.Builder(context)
+                    .setTitle(R.string.no_connection)
+                    .setMessage(R.string.no_connection_message)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.try_again, null)
+                    .create();
 
-                    alert.setOnShowListener(new DialogInterface.OnShowListener() {
+            alert.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                @Override
+                public void onShow(DialogInterface dialogInterface) {
+                    Button button = alert.getButton(AlertDialog.BUTTON_POSITIVE);
+                    button.setOnClickListener(new View.OnClickListener() {
 
                         @Override
-                        public void onShow(DialogInterface dialogInterface) {
-                            Button button = alert.getButton(AlertDialog.BUTTON_POSITIVE);
-                            button.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View view) {
+                            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 
-                                @Override
-                                public void onClick(View view) {
-                                    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-
-                                    if (activeNetwork != null &&
-                                            activeNetwork.isConnectedOrConnecting()) {
-                                        download.start();
-                                        alert.dismiss();
-                                    }
-                                }
-                            });
+                            if (activeNetwork != null &&
+                                    activeNetwork.isConnectedOrConnecting()) {
+                                download.start();
+                                alert.dismiss();
+                            }
                         }
                     });
-
-                    // without this, pressing back button would have no effect
-                    alert.setOnKeyListener(new Dialog.OnKeyListener() {
-                        @Override
-                        public boolean onKey(DialogInterface arg0, int keyCode,
-                                             KeyEvent event) {
-                            if (keyCode == KeyEvent.KEYCODE_BACK)
-                                finish();
-
-                            return false;
-                        }
-                    });
-
-                    alert.show();
                 }
+            });
 
-                editor.putInt("DEFAULT_REGION", position);
-                editor.apply();
-            }
+            // without this, pressing back button would have no effect
+            alert.setOnKeyListener(new Dialog.OnKeyListener() {
+                @Override
+                public boolean onKey(DialogInterface arg0, int keyCode,
+                                     KeyEvent event) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK)
+                        finish();
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
+                    return false;
+                }
+            });
+
+            alert.show();
+        }
 
         pagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         viewPager = findViewById(R.id.viewpager_main);
         viewPager.setAdapter(pagerAdapter);
-
-        Intent intent = getIntent();
-
-        boolean region_selected = false;
-
-        if (intent != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
-            String path = intent.getData().getPath();
-
-            if (path != null) {
-                if (path.equals(getString(R.string.piemonte_url_path))) {
-                    spinner.setSelection(0);
-                    region_selected = true;
-                } else if (path.equals(getString(R.string.lombardia_url_path))) {
-                    spinner.setSelection(1);
-                    region_selected = true;
-                }
-            }
-        }
-
-        if (!region_selected)
-            spinner.setSelection(sharedPref.getInt("DEFAULT_REGION", Context.MODE_PRIVATE));
     }
 
     @Override
