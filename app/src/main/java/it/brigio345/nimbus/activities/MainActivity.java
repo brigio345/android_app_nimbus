@@ -4,10 +4,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -18,9 +20,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.Spinner;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -115,6 +115,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager == null) {
+            return false;
+        }
+        Network nw = connectivityManager.getActiveNetwork();
+        if (nw == null) {
+            return false;
+        }
+        NetworkCapabilities actNw = connectivityManager.getNetworkCapabilities(nw);
+        return actNw != null && (actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,14 +141,9 @@ public class MainActivity extends AppCompatActivity {
 
         final Context context = this;
 
-        final ConnectivityManager cm = (ConnectivityManager) getSystemService(
-                Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-
         final Thread download = new Thread(new DownloadData());
 
-        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
-            findViewById(R.id.progressbar_main).setVisibility(View.VISIBLE);
+        if (isNetworkAvailable()) {
             download.start();
         } else {
             final AlertDialog alert = new AlertDialog.Builder(context)
@@ -151,10 +162,8 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         public void onClick(View view) {
-                            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-
-                            if (activeNetwork != null &&
-                                    activeNetwork.isConnectedOrConnecting()) {
+                            if (isNetworkAvailable()) {
+                                findViewById(R.id.progressbar_main).setVisibility(View.VISIBLE);
                                 download.start();
                                 alert.dismiss();
                             }
