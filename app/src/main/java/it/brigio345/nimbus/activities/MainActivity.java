@@ -24,12 +24,14 @@ import android.widget.Spinner;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,7 +41,8 @@ import it.brigio345.nimbus.R;
 
 public class MainActivity extends AppCompatActivity {
     private String url;
-    private Elements content;
+    private Element overviewContent;
+    private Elements daysContent;
     private Elements days;
     private MainPagerAdapter pagerAdapter;
     private ViewPager viewPager;
@@ -66,29 +69,39 @@ public class MainActivity extends AppCompatActivity {
             try {
                 InputStream inStream = new URL(url).openStream();
                 Document document = Jsoup.parse(inStream, "ISO-8859-1", url);
-                content = document.getElementsByAttributeValue("class", "MsoNormal");
+                daysContent = document.getElementsByAttributeValue("class", "MsoNormal");
+                overviewContent = daysContent.get(0);
+                daysContent.remove(0);
                 days = document.getElementsByTag("table");
-
+                // Remove the first elements that are not actually days.
+                days.subList(0, (days.size() - daysContent.size())).clear();
                 pagerAdapter.clear();
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         pagerAdapter.addPage(getString(R.string.situazione_meteorologica),
-                                content.get(0).text(), true);
+                                overviewContent.text(), true);
 
                         String day;
                         Calendar today = Calendar.getInstance();
 
-                        int size = content.size();
+                        int size = daysContent.size();
                         boolean todaySet = false;
                         boolean tomorrowSet = false;
 
-                        for (int i = 1, j = 6; i < size; i++, j++) {
-                            day = days.get(j).text();
+                        for (int i = 0; i < size; i++) {
+                            day = days.get(i).text();
+
+                            GregorianCalendar dayCalendar;
+                            try {
+                                dayCalendar = DateConverter.convertDate(day);
+                            } catch (DateConverter.InvalidStringDateException e) {
+                                break;
+                            }
 
                             // if the date is older than "today", don't add to tabs
-                            if (DateConverter.convertDate(day).compareTo(today) < 0)
+                            if (dayCalendar.compareTo(today) < 0)
                                 continue;
 
                             if (tomorrowSet) {
@@ -101,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                                 todaySet = true;
                             }
 
-                            pagerAdapter.addPage(day, content.get(i).text(), false);
+                            pagerAdapter.addPage(day, daysContent.get(i).text(), false);
                         }
 
                         pagerAdapter.notifyDataSetChanged();
@@ -234,13 +247,13 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         final List<Integer> mSelectedItems = new LinkedList<>();
 
-        switch (id) {
-            case R.id.item_openinbrowser:
+            if (id == R.id.item_openinbrowser) {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(browserIntent);
                 return true;
+            }
 
-            case R.id.item_share:
+            if (id == R.id.item_share) {
                 AlertDialog alert = new AlertDialog.Builder(this)
                         .setTitle(R.string.share_forecast)
                         .setMultiChoiceItems(pagerAdapter.getPageTitles(), null,
@@ -288,9 +301,9 @@ public class MainActivity extends AppCompatActivity {
                         .setNegativeButton(R.string.cancel, null)
                         .create();
 
-                alert.show();
+            alert.show();
 
-                return true;
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
