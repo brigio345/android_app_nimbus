@@ -1,10 +1,14 @@
 package it.brigio345.nimbus.utils;
 
+import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DateConverter {
-    private static final String[] MONTHS = {"GENNAIO", "FEBBRAIO", "MARZO", "APRILE", "MAGGIO",
-            "GIUGNO", "LUGLIO", "AGOSTO", "SETTEMBRE", "OTTOBRE", "NOVEMBRE", "DICEMBRE"};
+    private static final List<String> MONTHS = Arrays.asList("GENNAIO", "FEBBRAIO", "MARZO", "APRILE", "MAGGIO",
+            "GIUGNO", "LUGLIO", "AGOSTO", "SETTEMBRE", "OTTOBRE", "NOVEMBRE", "DICEMBRE");
 
     public static class InvalidStringDateException extends Exception {
         public InvalidStringDateException(String message) {
@@ -13,24 +17,26 @@ public class DateConverter {
     }
 
     public static GregorianCalendar convertDate(String stringDate) throws InvalidStringDateException {
-        String[] strings = stringDate.split(" ");
+        Pattern pattern = Pattern.compile("^\\w+\\s(\\d{1,2})\\s([A-Z]+)\\s(\\d{4})$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(stringDate.trim());
 
-        if (strings.length != 4)
-            throw new InvalidStringDateException("Unexpected number of split elements.");
+        if (!matcher.matches())
+            throw new InvalidStringDateException("Date string does not match expected format.");
 
-        String dayStr = strings[1];
-        String monthStr = strings[2];
-        String yearStr = strings[3];
+        String dayStr = matcher.group(1);
+        String monthStr = matcher.group(2);
+        String yearStr = matcher.group(3);
 
-        int month;
-        for (month = 0; month < MONTHS.length; month++)
-            if (MONTHS[month].equals(monthStr))
-                break;
+        int month = MONTHS.indexOf(monthStr.toUpperCase());
+
+        if (month == -1)
+            throw new InvalidStringDateException("Invalid month: " + monthStr);
 
         try {
-            return new GregorianCalendar(Integer.parseInt(yearStr),
-                    month, Integer.parseInt(dayStr), 23, 59);
-        } catch (NumberFormatException nfe) {
+            int day = Integer.parseInt(dayStr);
+            int year = Integer.parseInt(yearStr);
+            return new GregorianCalendar(year, month, day, 23, 59);
+        } catch (NumberFormatException e) {
             throw new InvalidStringDateException("Invalid date format.");
         }
     }
