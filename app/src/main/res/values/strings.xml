@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Nimbus</string>
-    <string name="situazione_meteorologica">La situazione meteorologica</string>
+    <string name="situazione_meteorologica">Panoramica</string>
     <string name="oggi">Oggi</string>
     <string name="domani">Domani</string>
     <string name="precipitazioni">Precipitazioni</string>

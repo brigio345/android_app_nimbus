@@ -1,0 +1,13 @@
+<resources>
+    <style name="AppTheme.Blue" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+    </style>
+
+    <style name="App.Toolbar" parent="Widget.Material3.Toolbar.OnSurface">
+        <item name="titleTextAppearance">@style/App.TitleTextAppearance</item>
+    </style>
+
+    <style name="App.TitleTextAppearance" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+</resources>

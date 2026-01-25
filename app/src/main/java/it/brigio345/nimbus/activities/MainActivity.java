@@ -10,18 +10,20 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -92,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
                                 continue;
 
                             if (tomorrowSet) {
-                                day = day.replaceFirst("\\s[\\d]{4}", ""); // removes the year
+                                day = day.split(" ")[0] + " " + day.split(" ")[1];
+                                day = day.substring(0, 1) + day.substring(1).toLowerCase();
                             } else if (todaySet) {
                                 day = getString(R.string.domani);
                                 tomorrowSet = true;

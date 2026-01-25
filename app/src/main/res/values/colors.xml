@@ -1,11 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#ef6c00</color>
-    <color name="colorPrecipitazioni">#ff9800</color>
-    <color name="colorCielo">#2196F3</color>
-    <color name="colorTemperature">#ff5252</color>
-    <color name="colorVenti">#b388ff</color>
-    <color name="colorMain">#CDDC39</color>
 </resources>
