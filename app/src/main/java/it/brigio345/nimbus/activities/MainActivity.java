@@ -62,8 +62,17 @@ public class MainActivity extends AppCompatActivity {
                 overviewContent = daysContent.get(0);
                 daysContent.remove(0);
                 days = document.getElementsByTag("table");
-                // Remove the first elements that are not actually days.
-                days.subList(0, (days.size() - daysContent.size())).clear();
+
+                // Remove the elements that are not actually days.
+                for (int i = 0; i < days.size(); i++) {
+                    try {
+                        DateConverter.convertDate(days.get(i).text());
+                    } catch (DateConverter.InvalidStringDateException e) {
+                        days.remove(i);
+                        i--;
+                    }
+                }
+
                 pagerAdapter.clear();
 
                 runOnUiThread(new Runnable() {
