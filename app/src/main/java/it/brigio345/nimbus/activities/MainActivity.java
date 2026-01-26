@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                             String dayOfWeek = dayCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
                             int dayOfMonth = dayCalendar.get(Calendar.DAY_OF_MONTH);
                             day = dayOfWeek + " " + dayOfMonth;
-                            day = day.substring(0, 1).toUpperCase() + day.substring(1);
+                            day = day.substring(0, 1).toUpperCase(Locale.getDefault()) + day.substring(1);
                         }
 
                         pagerAdapter.addPage(day, daysContent.get(i).wholeText(), false);

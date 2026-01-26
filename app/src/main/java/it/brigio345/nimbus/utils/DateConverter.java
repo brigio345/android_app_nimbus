@@ -3,6 +3,7 @@ package it.brigio345.nimbus.utils;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +28,7 @@ public class DateConverter {
         String monthStr = matcher.group(2);
         String yearStr = matcher.group(3);
 
-        int month = MONTHS.indexOf(monthStr.toUpperCase());
+        int month = MONTHS.indexOf(monthStr.toUpperCase(Locale.getDefault()));
 
         if (month == -1)
             throw new InvalidStringDateException("Invalid month: " + monthStr);
