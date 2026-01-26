@@ -221,59 +221,59 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         final List<Integer> mSelectedItems = new LinkedList<>();
 
-            if (id == R.id.item_openinbrowser) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(browserIntent);
-                return true;
-            }
+        if (id == R.id.item_openinbrowser) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(browserIntent);
+            return true;
+        }
 
-            if (id == R.id.item_share) {
-                AlertDialog alert = new AlertDialog.Builder(this)
-                        .setTitle(R.string.share_forecast)
-                        .setMultiChoiceItems(pagerAdapter.getPageTitles(), null,
-                                new DialogInterface.OnMultiChoiceClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which,
-                                                        boolean isChecked) {
-                                        if (isChecked)
-                                            mSelectedItems.add(which);
+        if (id == R.id.item_share) {
+            AlertDialog alert = new AlertDialog.Builder(this)
+                    .setTitle(R.string.share_forecast)
+                    .setMultiChoiceItems(pagerAdapter.getPageTitles(), null,
+                            new DialogInterface.OnMultiChoiceClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which,
+                                                    boolean isChecked) {
+                                    if (isChecked)
+                                        mSelectedItems.add(which);
 
-                                        else if (mSelectedItems.contains(which))
-                                            mSelectedItems.remove(Integer.valueOf(which));
-                                    }
-                                })
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (mSelectedItems.size() != 0) {
-                                    Intent sendIntent = new Intent();
-                                    sendIntent.setAction(Intent.ACTION_SEND);
-                                    StringBuilder builder = new StringBuilder();
-
-                                    builder.append(getString(R.string.share_intro));
-
-                                    builder.append(url);
-
-                                    builder.append("\n\n");
-
-                                    for (int it : mSelectedItems) {
-                                        builder.append(pagerAdapter.getPageTitle(it));
-                                        builder.append("\n\n");
-                                        builder.append(pagerAdapter.getPageContent(it));
-                                        builder.append("\n\n\n");
-                                    }
-
-                                    builder.append(getString(R.string.share_closing));
-
-                                    sendIntent.putExtra(Intent.EXTRA_TEXT, builder.toString());
-                                    sendIntent.setType("text/plain");
-                                    startActivity(Intent.createChooser(sendIntent,
-                                            getString(R.string.share_forecast)));
+                                    else if (mSelectedItems.contains(which))
+                                        mSelectedItems.remove(Integer.valueOf(which));
                                 }
+                            })
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (mSelectedItems.size() != 0) {
+                                Intent sendIntent = new Intent();
+                                sendIntent.setAction(Intent.ACTION_SEND);
+                                StringBuilder builder = new StringBuilder();
+
+                                builder.append(getString(R.string.share_intro));
+
+                                builder.append(url);
+
+                                builder.append("\n\n");
+
+                                for (int it : mSelectedItems) {
+                                    builder.append(pagerAdapter.getPageTitle(it));
+                                    builder.append("\n\n");
+                                    builder.append(pagerAdapter.getPageContent(it));
+                                    builder.append("\n\n\n");
+                                }
+
+                                builder.append(getString(R.string.share_closing));
+
+                                sendIntent.putExtra(Intent.EXTRA_TEXT, builder.toString());
+                                sendIntent.setType("text/plain");
+                                startActivity(Intent.createChooser(sendIntent,
+                                        getString(R.string.share_forecast)));
                             }
-                        })
-                        .setNegativeButton(R.string.cancel, null)
-                        .create();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .create();
 
             alert.show();
 
