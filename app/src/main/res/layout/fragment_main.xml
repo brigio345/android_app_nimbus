@@ -23,7 +23,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="@color/md_theme_onPrimaryContainer_mediumContrast" />
+                android:textColor="@color/md_theme_onPrimaryContainer_mediumContrast"
+                android:textIsSelectable="true"/>
 
         </com.google.android.material.card.MaterialCardView>
     </FrameLayout>

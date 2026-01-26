@@ -27,7 +27,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="@color/md_theme_onPrimaryContainer_mediumContrast" />
+                android:textColor="@color/md_theme_onPrimaryContainer_mediumContrast"
+                android:textIsSelectable="true" />
 
             <TextView
                 android:id="@+id/textview_dayitem_content"
@@ -35,7 +36,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="@color/md_theme_onPrimaryContainer_mediumContrast" />
+                android:textColor="@color/md_theme_onPrimaryContainer_mediumContrast"
+                android:textIsSelectable="true" />
 
         </LinearLayout>
 
