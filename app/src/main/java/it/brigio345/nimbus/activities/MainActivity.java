@@ -75,9 +75,11 @@ public class MainActivity extends AppCompatActivity {
 
                 pagerAdapter.clear();
 
+                String overviewContentStr = overviewContent.wholeText().trim()
+                        .replaceAll("(?m)(^[ \t]*\\R){2,}", "\n");
                 runOnUiThread(() -> {
                     pagerAdapter.addPage(getString(R.string.situazione_meteorologica),
-                            overviewContent.wholeText().trim(), true);
+                            overviewContentStr, true);
 
                     String day;
                     Calendar today = Calendar.getInstance();
