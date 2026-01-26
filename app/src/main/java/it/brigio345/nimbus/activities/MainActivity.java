@@ -44,12 +44,12 @@ import it.brigio345.nimbus.adapters.MainPagerAdapter;
 import it.brigio345.nimbus.utils.DateConverter;
 
 public class MainActivity extends AppCompatActivity {
-    private String url;
-    private Element overviewContent;
-    private Elements daysContent;
-    private Elements days;
-    private MainPagerAdapter pagerAdapter;
-    private ViewPager2 viewPager;
+    String url;
+    Element overviewContent;
+    Elements daysContent;
+    Elements days;
+    MainPagerAdapter pagerAdapter;
+    ViewPager2 viewPager;
 
     private class DownloadData implements Runnable {
         @Override
