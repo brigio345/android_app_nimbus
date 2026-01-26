@@ -15,7 +15,7 @@
             style="?attr/materialCardViewFilledStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="?attr/colorPrimaryContainer"
+            app:cardBackgroundColor="@color/md_theme_primaryContainer_mediumContrast"
             app:contentPadding="16dp">
 
             <TextView
@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="?attr/colorOnPrimaryContainer" />
+                android:textColor="@color/md_theme_onPrimaryContainer_mediumContrast" />
 
         </com.google.android.material.card.MaterialCardView>
     </FrameLayout>

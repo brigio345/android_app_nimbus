@@ -15,7 +15,7 @@
         android:layout_marginBottom="4dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        app:cardBackgroundColor="?attr/colorPrimaryContainer">
+        app:cardBackgroundColor="@color/md_theme_primaryContainer_mediumContrast">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -28,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="?attr/colorOnPrimaryContainer" />
+                android:textColor="@color/md_theme_onPrimaryContainer_mediumContrast" />
 
             <TextView
                 android:id="@+id/textview_dayitem_content"
@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="?attr/colorOnPrimaryContainer" />
+                android:textColor="@color/md_theme_onPrimaryContainer_mediumContrast" />
 
         </LinearLayout>
 
