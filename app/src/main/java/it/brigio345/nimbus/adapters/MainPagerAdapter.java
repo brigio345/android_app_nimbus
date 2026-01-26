@@ -2,8 +2,8 @@ package it.brigio345.nimbus.adapters;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,32 +11,24 @@ import java.util.List;
 import it.brigio345.nimbus.fragments.DayFragment;
 import it.brigio345.nimbus.fragments.MainFragment;
 
-public class MainPagerAdapter extends FragmentStatePagerAdapter {
-    private List<Fragment> fragments;
-    private List<String> tabTitles;
-    private List<String> tabContents;
+public class MainPagerAdapter extends FragmentStateAdapter {
+    private final List<Fragment> fragments = new LinkedList<>();
+    private final List<String> tabTitles = new LinkedList<>();
+    private final List<String> tabContents = new LinkedList<>();
 
-    public MainPagerAdapter(FragmentManager fm) {
-        super(fm);
-
-        fragments = new LinkedList<>();
-        tabTitles = new LinkedList<>();
-        tabContents = new LinkedList<>();
+    public MainPagerAdapter(FragmentActivity fa) {
+        super(fa);
     }
 
+    @NonNull
     @Override
-    public Fragment getItem (int position) {
+    public Fragment createFragment(int position) {
         return fragments.get(position);
     }
 
     @Override
-    public int getCount() {
+    public int getItemCount() {
         return fragments.size();
-    }
-
-    @Override
-    public int getItemPosition(@NonNull Object object) {
-        return POSITION_NONE;
     }
 
     public void addPage(String title, String content, boolean isMain) {
@@ -49,13 +41,12 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
             fragments.add(MainFragment.newInstance(content));
     }
 
-    @Override
     public CharSequence getPageTitle(int position) {
         return tabTitles.get(position);
     }
 
     public CharSequence[] getPageTitles() {
-        return tabTitles.toArray(new CharSequence[tabTitles.size()]);
+        return tabTitles.toArray(new CharSequence[0]);
     }
 
     public String getPageContent(int position) {
@@ -63,8 +54,12 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public void clear() {
+        if (fragments.isEmpty() && tabTitles.isEmpty() && tabContents.isEmpty()) {
+            return;
+        }
         fragments.clear();
         tabTitles.clear();
         tabContents.clear();
+        notifyDataSetChanged();
     }
 }

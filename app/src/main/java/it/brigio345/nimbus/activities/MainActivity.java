@@ -7,9 +7,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -18,12 +16,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -38,9 +38,9 @@ import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
+import it.brigio345.nimbus.R;
 import it.brigio345.nimbus.adapters.MainPagerAdapter;
 import it.brigio345.nimbus.utils.DateConverter;
-import it.brigio345.nimbus.R;
 
 public class MainActivity extends AppCompatActivity {
     private String url;
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private Elements daysContent;
     private Elements days;
     private MainPagerAdapter pagerAdapter;
-    private ViewPager viewPager;
+    private ViewPager2 viewPager;
 
     private class DownloadData implements Runnable {
         @Override
@@ -75,52 +75,49 @@ public class MainActivity extends AppCompatActivity {
 
                 pagerAdapter.clear();
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        pagerAdapter.addPage(getString(R.string.situazione_meteorologica),
-                                overviewContent.wholeText().trim(), true);
+                runOnUiThread(() -> {
+                    pagerAdapter.addPage(getString(R.string.situazione_meteorologica),
+                            overviewContent.wholeText().trim(), true);
 
-                        String day;
-                        Calendar today = Calendar.getInstance();
+                    String day;
+                    Calendar today = Calendar.getInstance();
 
-                        int size = daysContent.size();
-                        boolean todaySet = false;
-                        boolean tomorrowSet = false;
+                    int size = daysContent.size();
+                    boolean todaySet = false;
+                    boolean tomorrowSet = false;
 
-                        for (int i = 0; i < size; i++) {
-                            day = days.get(i).text();
+                    for (int i = 0; i < size; i++) {
+                        day = days.get(i).text();
 
-                            GregorianCalendar dayCalendar;
-                            try {
-                                dayCalendar = DateConverter.convertDate(day);
-                            } catch (DateConverter.InvalidStringDateException e) {
-                                break;
-                            }
-
-                            // if the date is older than "today", don't add to tabs
-                            if (dayCalendar.compareTo(today) < 0)
-                                continue;
-
-                            if (tomorrowSet) {
-                                day = day.split(" ")[0] + " " + day.split(" ")[1];
-                                day = day.substring(0, 1) + day.substring(1).toLowerCase();
-                            } else if (todaySet) {
-                                day = getString(R.string.domani);
-                                tomorrowSet = true;
-                            } else {
-                                day = getString(R.string.oggi);
-                                todaySet = true;
-                            }
-
-                            pagerAdapter.addPage(day, daysContent.get(i).wholeText(), false);
+                        GregorianCalendar dayCalendar;
+                        try {
+                            dayCalendar = DateConverter.convertDate(day);
+                        } catch (DateConverter.InvalidStringDateException e) {
+                            break;
                         }
 
-                        pagerAdapter.notifyDataSetChanged();
-                        viewPager.setCurrentItem(0);
+                        // if the date is older than "today", don't add to tabs
+                        if (dayCalendar.compareTo(today) < 0)
+                            continue;
 
-                        findViewById(R.id.progressbar_main).setVisibility(View.INVISIBLE);
+                        if (tomorrowSet) {
+                            day = day.split(" ")[0] + " " + day.split(" ")[1];
+                            day = day.substring(0, 1) + day.substring(1).toLowerCase();
+                        } else if (todaySet) {
+                            day = getString(R.string.domani);
+                            tomorrowSet = true;
+                        } else {
+                            day = getString(R.string.oggi);
+                            todaySet = true;
+                        }
+
+                        pagerAdapter.addPage(day, daysContent.get(i).wholeText(), false);
                     }
+
+                    pagerAdapter.notifyDataSetChanged();
+                    viewPager.setCurrentItem(0);
+
+                    findViewById(R.id.progressbar_main).setVisibility(View.INVISIBLE);
                 });
             } catch (IOException e) {
                 e.printStackTrace();
@@ -166,46 +163,36 @@ public class MainActivity extends AppCompatActivity {
                     .setPositiveButton(R.string.try_again, null)
                     .create();
 
-            alert.setOnShowListener(new DialogInterface.OnShowListener() {
-
-                @Override
-                public void onShow(DialogInterface dialogInterface) {
-                    Button button = alert.getButton(AlertDialog.BUTTON_POSITIVE);
-                    button.setOnClickListener(new View.OnClickListener() {
-
-                        @Override
-                        public void onClick(View view) {
-                            if (isNetworkAvailable()) {
-                                findViewById(R.id.progressbar_main).setVisibility(View.VISIBLE);
-                                download.start();
-                                alert.dismiss();
-                            }
-                        }
-                    });
-                }
+            alert.setOnShowListener(dialogInterface -> {
+                Button button = alert.getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(view -> {
+                    if (isNetworkAvailable()) {
+                        findViewById(R.id.progressbar_main).setVisibility(View.VISIBLE);
+                        download.start();
+                        alert.dismiss();
+                    }
+                });
             });
 
             // without this, pressing back button would have no effect
-            alert.setOnKeyListener(new Dialog.OnKeyListener() {
-                @Override
-                public boolean onKey(DialogInterface arg0, int keyCode,
-                                     KeyEvent event) {
-                    if (keyCode == KeyEvent.KEYCODE_BACK)
-                        finish();
+            alert.setOnKeyListener((arg0, keyCode, event) -> {
+                if (keyCode == KeyEvent.KEYCODE_BACK)
+                    finish();
 
-                    return false;
-                }
+                return false;
             });
 
             alert.show();
         }
 
-        pagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
+        pagerAdapter = new MainPagerAdapter(this);
         viewPager = findViewById(R.id.viewpager_main);
         viewPager.setAdapter(pagerAdapter);
 
         TabLayout tabLayout = findViewById(R.id.tablayout_main);
-        tabLayout.setupWithViewPager(viewPager);
+        new TabLayoutMediator(tabLayout, viewPager,
+                (tab, position) -> tab.setText(pagerAdapter.getPageTitle(position))
+        ).attach();
     }
 
     @Override
@@ -231,45 +218,38 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog alert = new AlertDialog.Builder(this)
                     .setTitle(R.string.share_forecast)
                     .setMultiChoiceItems(pagerAdapter.getPageTitles(), null,
-                            new DialogInterface.OnMultiChoiceClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which,
-                                                    boolean isChecked) {
-                                    if (isChecked)
-                                        mSelectedItems.add(which);
+                            (dialog, which, isChecked) -> {
+                                if (isChecked)
+                                    mSelectedItems.add(which);
 
-                                    else if (mSelectedItems.contains(which))
-                                        mSelectedItems.remove(Integer.valueOf(which));
-                                }
+                                else if (mSelectedItems.contains(which))
+                                    mSelectedItems.remove(Integer.valueOf(which));
                             })
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (mSelectedItems.size() != 0) {
-                                Intent sendIntent = new Intent();
-                                sendIntent.setAction(Intent.ACTION_SEND);
-                                StringBuilder builder = new StringBuilder();
+                    .setPositiveButton(R.string.ok, (dialog, which) -> {
+                        if (mSelectedItems.size() != 0) {
+                            Intent sendIntent = new Intent();
+                            sendIntent.setAction(Intent.ACTION_SEND);
+                            StringBuilder builder = new StringBuilder();
 
-                                builder.append(getString(R.string.share_intro));
+                            builder.append(getString(R.string.share_intro));
 
-                                builder.append(url);
+                            builder.append(url);
 
+                            builder.append("\n\n");
+
+                            for (int it : mSelectedItems) {
+                                builder.append(pagerAdapter.getPageTitle(it));
                                 builder.append("\n\n");
-
-                                for (int it : mSelectedItems) {
-                                    builder.append(pagerAdapter.getPageTitle(it));
-                                    builder.append("\n\n");
-                                    builder.append(pagerAdapter.getPageContent(it));
-                                    builder.append("\n\n\n");
-                                }
-
-                                builder.append(getString(R.string.share_closing));
-
-                                sendIntent.putExtra(Intent.EXTRA_TEXT, builder.toString());
-                                sendIntent.setType("text/plain");
-                                startActivity(Intent.createChooser(sendIntent,
-                                        getString(R.string.share_forecast)));
+                                builder.append(pagerAdapter.getPageContent(it));
+                                builder.append("\n\n\n");
                             }
+
+                            builder.append(getString(R.string.share_closing));
+
+                            sendIntent.putExtra(Intent.EXTRA_TEXT, builder.toString());
+                            sendIntent.setType("text/plain");
+                            startActivity(Intent.createChooser(sendIntent,
+                                    getString(R.string.share_forecast)));
                         }
                     })
                     .setNegativeButton(R.string.cancel, null)
