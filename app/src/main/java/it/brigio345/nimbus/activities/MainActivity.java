@@ -37,6 +37,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import it.brigio345.nimbus.R;
 import it.brigio345.nimbus.adapters.MainPagerAdapter;
@@ -83,10 +84,10 @@ public class MainActivity extends AppCompatActivity {
 
                     String day;
                     Calendar today = Calendar.getInstance();
+                    Calendar tomorrow = Calendar.getInstance();
+                    tomorrow.add(Calendar.DAY_OF_YEAR, 1);
 
                     int size = daysContent.size();
-                    boolean todaySet = false;
-                    boolean tomorrowSet = false;
 
                     for (int i = 0; i < size; i++) {
                         day = days.get(i).text();
@@ -102,15 +103,17 @@ public class MainActivity extends AppCompatActivity {
                         if (dayCalendar.compareTo(today) < 0)
                             continue;
 
-                        if (tomorrowSet) {
-                            day = day.split(" ")[0] + " " + day.split(" ")[1];
-                            day = day.substring(0, 1) + day.substring(1).toLowerCase();
-                        } else if (todaySet) {
-                            day = getString(R.string.domani);
-                            tomorrowSet = true;
-                        } else {
+                        if (dayCalendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                                dayCalendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)) {
                             day = getString(R.string.oggi);
-                            todaySet = true;
+                        } else if (dayCalendar.get(Calendar.YEAR) == tomorrow.get(Calendar.YEAR) &&
+                                dayCalendar.get(Calendar.DAY_OF_YEAR) == tomorrow.get(Calendar.DAY_OF_YEAR)) {
+                            day = getString(R.string.domani);
+                        } else {
+                            String dayOfWeek = dayCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
+                            int dayOfMonth = dayCalendar.get(Calendar.DAY_OF_MONTH);
+                            day = dayOfWeek + " " + dayOfMonth;
+                            day = day.substring(0, 1).toUpperCase() + day.substring(1);
                         }
 
                         pagerAdapter.addPage(day, daysContent.get(i).wholeText(), false);
