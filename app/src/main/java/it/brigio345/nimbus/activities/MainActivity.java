@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         pagerAdapter.addPage(getString(R.string.situazione_meteorologica),
-                                overviewContent.text(), true);
+                                overviewContent.wholeText().trim(), true);
 
                         String day;
                         Calendar today = Calendar.getInstance();
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                                 todaySet = true;
                             }
 
-                            pagerAdapter.addPage(day, daysContent.get(i).text(), false);
+                            pagerAdapter.addPage(day, daysContent.get(i).wholeText(), false);
                         }
 
                         pagerAdapter.notifyDataSetChanged();

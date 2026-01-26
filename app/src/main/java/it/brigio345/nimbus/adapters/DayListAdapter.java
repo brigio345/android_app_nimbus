@@ -32,7 +32,7 @@ public class DayListAdapter extends BaseAdapter {
         }
 
         TextView textView = convertView.findViewById(R.id.textview_dayitem_content);
-        textView.setText(content[position]);
+        textView.setText(content[position].trim());
 
         String title;
 
