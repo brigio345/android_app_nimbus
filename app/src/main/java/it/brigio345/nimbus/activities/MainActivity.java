@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         if (isNetworkAvailable()) {
             download.start();
         } else {
-            final AlertDialog alert = new AlertDialog.Builder(context)
+            final AlertDialog alert = new MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.no_connection)
                     .setMessage(R.string.no_connection_message)
                     .setCancelable(false)
@@ -217,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (id == R.id.item_share) {
-            AlertDialog alert = new AlertDialog.Builder(this)
+            AlertDialog alert = new MaterialAlertDialogBuilder(this)
                     .setTitle(R.string.share_forecast)
                     .setMultiChoiceItems(pagerAdapter.getPageTitles(), null,
                             (dialog, which, isChecked) -> {
