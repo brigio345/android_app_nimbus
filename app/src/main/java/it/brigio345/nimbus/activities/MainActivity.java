@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Vector;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -64,15 +65,16 @@ public class MainActivity extends AppCompatActivity {
                 daysContent.remove(0);
                 days = document.getElementsByTag("table");
 
+                Vector<GregorianCalendar> dayCalendars = new Vector<>();
                 // Remove the elements that are not actually days.
-                for (int i = 0; i < days.size(); i++) {
+                days.removeIf(day -> {
                     try {
-                        DateConverter.convertDate(days.get(i).text());
+                        dayCalendars.add(DateConverter.convertDate(day.text()));
+                        return false;
                     } catch (DateConverter.InvalidStringDateException e) {
-                        days.remove(i);
-                        i--;
+                        return true;
                     }
-                }
+                });
 
                 pagerAdapter.clear();
 
@@ -92,12 +94,7 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < size; i++) {
                         day = days.get(i).text();
 
-                        GregorianCalendar dayCalendar;
-                        try {
-                            dayCalendar = DateConverter.convertDate(day);
-                        } catch (DateConverter.InvalidStringDateException e) {
-                            break;
-                        }
+                        GregorianCalendar dayCalendar = dayCalendars.get(i);
 
                         // if the date is older than "today", don't add to tabs
                         if (dayCalendar.compareTo(today) < 0)
