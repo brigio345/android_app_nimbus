@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
     Elements days;
     MainPagerAdapter pagerAdapter;
     ViewPager2 viewPager;
+    ConnectivityManager.NetworkCallback networkCallback;
+    Thread download;
 
     private class DownloadData implements Runnable {
         @Override
@@ -154,38 +157,25 @@ public class MainActivity extends AppCompatActivity {
 
         final Context context = this;
 
-        final Thread download = new Thread(new DownloadData());
+        download = new Thread(new DownloadData());
 
         if (isNetworkAvailable()) {
             download.start();
         } else {
-            final AlertDialog alert = new MaterialAlertDialogBuilder(context)
-                    .setTitle(R.string.no_connection)
-                    .setMessage(R.string.no_connection_message)
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.try_again, null)
-                    .create();
-
-            alert.setOnShowListener(dialogInterface -> {
-                Button button = alert.getButton(AlertDialog.BUTTON_POSITIVE);
-                button.setOnClickListener(view -> {
-                    if (isNetworkAvailable()) {
-                        findViewById(R.id.progressbar_main).setVisibility(View.VISIBLE);
-                        download.start();
-                        alert.dismiss();
-                    }
-                });
-            });
-
-            // without this, pressing back button would have no effect
-            alert.setOnKeyListener((arg0, keyCode, event) -> {
-                if (keyCode == KeyEvent.KEYCODE_BACK)
-                    finish();
-
-                return false;
-            });
-
-            alert.show();
+            findViewById(R.id.progressbar_main).setVisibility(View.VISIBLE);
+            final ConnectivityManager connectivityManager = (ConnectivityManager)
+                    getSystemService(Context.CONNECTIVITY_SERVICE);
+            networkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    download.start();
+                    connectivityManager.unregisterNetworkCallback(this);
+                }
+            };
+            connectivityManager.registerNetworkCallback(
+                    new NetworkRequest.Builder().build(),
+                    networkCallback
+            );
         }
 
         pagerAdapter = new MainPagerAdapter(this);
@@ -196,6 +186,16 @@ public class MainActivity extends AppCompatActivity {
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> tab.setText(pagerAdapter.getPageTitle(position))
         ).attach();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (networkCallback != null) {
+            final ConnectivityManager connectivityManager = (ConnectivityManager)
+                    getSystemService(Context.CONNECTIVITY_SERVICE);
+            connectivityManager.unregisterNetworkCallback(networkCallback);
+        }
     }
 
     @Override
