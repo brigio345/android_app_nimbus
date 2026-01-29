@@ -17,6 +17,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import org.jsoup.Jsoup;
@@ -138,10 +139,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private synchronized void startDownload() {
+        startDownload(false);
+    }
+
+    private synchronized void startDownload(boolean waitForNetwork) {
+        swipeRefreshLayout.setRefreshing(true);
+        if (!isNetworkAvailable()) {
+            Snackbar.make(findViewById(R.id.swiperefresh_main), R.string.no_connection, Snackbar.LENGTH_SHORT).show();
+            if (!waitForNetwork) {
+                swipeRefreshLayout.setRefreshing(false);
+                return;
+            }
+            final ConnectivityManager connectivityManager = (ConnectivityManager)
+                    getSystemService(Context.CONNECTIVITY_SERVICE);
+            networkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    startDownload();
+                    connectivityManager.unregisterNetworkCallback(this);
+                }
+            };
+            connectivityManager.registerNetworkCallback(
+                    new NetworkRequest.Builder().build(),
+                    networkCallback
+            );
+            return;
+        }
         if (download != null && download.isAlive()) {
             return;
         }
-        swipeRefreshLayout.setRefreshing(true);
         download = new Thread(new DownloadData());
         download.start();
     }
@@ -182,24 +208,7 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout = findViewById(R.id.swiperefresh_main);
         swipeRefreshLayout.setOnRefreshListener(this::startDownload);
 
-        if (isNetworkAvailable()) {
-            startDownload();
-        } else {
-            swipeRefreshLayout.setRefreshing(true);
-            final ConnectivityManager connectivityManager = (ConnectivityManager)
-                    getSystemService(Context.CONNECTIVITY_SERVICE);
-            networkCallback = new ConnectivityManager.NetworkCallback() {
-                @Override
-                public void onAvailable(Network network) {
-                    startDownload();
-                    connectivityManager.unregisterNetworkCallback(this);
-                }
-            };
-            connectivityManager.registerNetworkCallback(
-                    new NetworkRequest.Builder().build(),
-                    networkCallback
-            );
-        }
+        startDownload(true);
     }
 
     @Override

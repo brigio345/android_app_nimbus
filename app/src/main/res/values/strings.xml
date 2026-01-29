@@ -7,9 +7,7 @@
     <string name="cielo">Cielo</string>
     <string name="temperature">Temperature</string>
     <string name="venti">Venti</string>
-    <string name="no_connection">Connessione non disponibile</string>
-    <string name="no_connection_message">Connettiti ad Internet e riprova</string>
-    <string name="try_again">Riprova</string>
+    <string name="no_connection">Nessuna connessione</string>
     <string name="open_in_browser">Apri nel browser</string>
     <string name="share_forecast">Condividi previsioni</string>
     <string name="ok" tools:ignore="ButtonCase,Typos">Ok</string>
