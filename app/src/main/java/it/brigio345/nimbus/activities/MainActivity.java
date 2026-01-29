@@ -1,8 +1,6 @@
 package it.brigio345.nimbus.activities;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -10,64 +8,72 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager2.widget.ViewPager2;
-
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Vector;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-
+import java.util.Vector;
 import it.brigio345.nimbus.R;
 import it.brigio345.nimbus.adapters.MainPagerAdapter;
 import it.brigio345.nimbus.utils.DateConverter;
 
 public class MainActivity extends AppCompatActivity {
     String url;
-    Element overviewContent;
-    Elements daysContent;
-    Elements days;
     MainPagerAdapter pagerAdapter;
     ViewPager2 viewPager;
+    SwipeRefreshLayout swipeRefreshLayout;
     ConnectivityManager.NetworkCallback networkCallback;
     Thread download;
+    private int documentHash;
+    private Calendar lastUpdateDate;
 
     private class DownloadData implements Runnable {
         @Override
         public void run() {
             url = getString(R.string.piemonte_url);
+            final Calendar now = Calendar.getInstance();
 
             try {
                 InputStream inStream = new URL(url).openStream();
                 Document document = Jsoup.parse(inStream, "ISO-8859-1", url);
-                daysContent = document.getElementsByAttributeValue("class", "MsoNormal");
-                overviewContent = daysContent.get(0);
+
+                int newDocumentHash = document.html().hashCode();
+                boolean isSameDay = false;
+                if (lastUpdateDate != null) {
+                    isSameDay = lastUpdateDate.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+                            lastUpdateDate.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR);
+                }
+
+                if (pagerAdapter.getItemCount() > 0 && newDocumentHash == documentHash && isSameDay) {
+                    runOnUiThread(() -> swipeRefreshLayout.setRefreshing(false));
+                    return;
+                }
+                documentHash = newDocumentHash;
+                lastUpdateDate = now;
+
+                Elements daysContent = document.getElementsByAttributeValue("class", "MsoNormal");
+                Element overviewContent = daysContent.get(0);
                 daysContent.remove(0);
-                days = document.getElementsByTag("table");
+                Elements days = document.getElementsByTag("table");
 
                 Vector<GregorianCalendar> dayCalendars = new Vector<>();
                 // Remove the elements that are not actually days.
@@ -80,11 +86,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                pagerAdapter.clear();
-
                 String overviewContentStr = overviewContent.wholeText().trim()
                         .replaceAll("(?m)(^[ \t]*\\R){2,}", "\n");
                 runOnUiThread(() -> {
+                    pagerAdapter.clear();
                     pagerAdapter.addPage(getString(R.string.situazione_meteorologica),
                             overviewContentStr, true);
 
@@ -123,12 +128,22 @@ public class MainActivity extends AppCompatActivity {
                     pagerAdapter.notifyDataSetChanged();
                     viewPager.setCurrentItem(0);
 
-                    findViewById(R.id.progressbar_main).setVisibility(View.INVISIBLE);
+                    swipeRefreshLayout.setRefreshing(false);
                 });
             } catch (IOException e) {
                 e.printStackTrace();
+                runOnUiThread(() -> swipeRefreshLayout.setRefreshing(false));
             }
         }
+    }
+
+    private synchronized void startDownload() {
+        if (download != null && download.isAlive()) {
+            return;
+        }
+        swipeRefreshLayout.setRefreshing(true);
+        download = new Thread(new DownloadData());
+        download.start();
     }
 
     private boolean isNetworkAvailable() {
@@ -155,29 +170,6 @@ public class MainActivity extends AppCompatActivity {
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final Context context = this;
-
-        download = new Thread(new DownloadData());
-
-        if (isNetworkAvailable()) {
-            download.start();
-        } else {
-            findViewById(R.id.progressbar_main).setVisibility(View.VISIBLE);
-            final ConnectivityManager connectivityManager = (ConnectivityManager)
-                    getSystemService(Context.CONNECTIVITY_SERVICE);
-            networkCallback = new ConnectivityManager.NetworkCallback() {
-                @Override
-                public void onAvailable(Network network) {
-                    download.start();
-                    connectivityManager.unregisterNetworkCallback(this);
-                }
-            };
-            connectivityManager.registerNetworkCallback(
-                    new NetworkRequest.Builder().build(),
-                    networkCallback
-            );
-        }
-
         pagerAdapter = new MainPagerAdapter(this);
         viewPager = findViewById(R.id.viewpager_main);
         viewPager.setAdapter(pagerAdapter);
@@ -186,6 +178,28 @@ public class MainActivity extends AppCompatActivity {
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> tab.setText(pagerAdapter.getPageTitle(position))
         ).attach();
+
+        swipeRefreshLayout = findViewById(R.id.swiperefresh_main);
+        swipeRefreshLayout.setOnRefreshListener(this::startDownload);
+
+        if (isNetworkAvailable()) {
+            startDownload();
+        } else {
+            swipeRefreshLayout.setRefreshing(true);
+            final ConnectivityManager connectivityManager = (ConnectivityManager)
+                    getSystemService(Context.CONNECTIVITY_SERVICE);
+            networkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    startDownload();
+                    connectivityManager.unregisterNetworkCallback(this);
+                }
+            };
+            connectivityManager.registerNetworkCallback(
+                    new NetworkRequest.Builder().build(),
+                    networkCallback
+            );
+        }
     }
 
     @Override
@@ -195,6 +209,9 @@ public class MainActivity extends AppCompatActivity {
             final ConnectivityManager connectivityManager = (ConnectivityManager)
                     getSystemService(Context.CONNECTIVITY_SERVICE);
             connectivityManager.unregisterNetworkCallback(networkCallback);
+        }
+        if (download != null && download.isAlive()) {
+            download.interrupt();
         }
     }
 
@@ -212,8 +229,10 @@ public class MainActivity extends AppCompatActivity {
         final List<Integer> mSelectedItems = new LinkedList<>();
 
         if (id == R.id.item_openinbrowser) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(browserIntent);
+            if (url != null) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(browserIntent);
+            }
             return true;
         }
 
@@ -235,9 +254,9 @@ public class MainActivity extends AppCompatActivity {
                             StringBuilder builder = new StringBuilder();
 
                             builder.append(getString(R.string.share_intro));
-
-                            builder.append(url);
-
+                            if (url != null) {
+                                builder.append(url);
+                            }
                             builder.append("\n\n");
 
                             for (int it : mSelectedItems) {
