@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -128,6 +129,13 @@ public class MainActivity extends AppCompatActivity {
 
                     pagerAdapter.notifyDataSetChanged();
                     viewPager.setCurrentItem(0);
+
+                    TabLayout tabLayout = findViewById(R.id.tablayout_main);
+                    if (pagerAdapter.getItemCount() > 0) {
+                        tabLayout.setVisibility(View.VISIBLE);
+                    } else {
+                        tabLayout.setVisibility(View.INVISIBLE);
+                    }
 
                     swipeRefreshLayout.setRefreshing(false);
                 });
