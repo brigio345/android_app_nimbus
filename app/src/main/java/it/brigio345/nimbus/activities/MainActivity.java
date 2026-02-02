@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -133,6 +134,10 @@ public class MainActivity extends AppCompatActivity {
                     TabLayout tabLayout = findViewById(R.id.tablayout_main);
                     if (pagerAdapter.getItemCount() > 0) {
                         tabLayout.setVisibility(View.VISIBLE);
+                        View loadingIndicator = findViewById(R.id.loadingindicator_main);
+                        if (loadingIndicator != null) {
+                            ((ViewGroup) loadingIndicator.getParent()).removeView(loadingIndicator);
+                        }
                     } else {
                         tabLayout.setVisibility(View.INVISIBLE);
                     }
@@ -151,7 +156,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private synchronized void startDownload(boolean waitForNetwork) {
-        swipeRefreshLayout.setRefreshing(true);
+        if (pagerAdapter.getItemCount() > 0)
+            swipeRefreshLayout.setRefreshing(true);
         if (!isNetworkAvailable()) {
             Snackbar.make(findViewById(R.id.swiperefresh_main), R.string.no_connection, Snackbar.LENGTH_SHORT).show();
             if (!waitForNetwork) {
