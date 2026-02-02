@@ -10,7 +10,7 @@
     <string name="no_connection">Nessuna connessione</string>
     <string name="open_in_browser">Apri nel browser</string>
     <string name="share_forecast">Condividi previsioni</string>
-    <string name="ok" tools:ignore="ButtonCase,Typos">Ok</string>
+    <string name="ok">OK</string>
     <string name="cancel">Annulla</string>
     <string name="piemonte_url">https://www.nimbus.it/italiameteo/previpiemonte.htm</string>
     <string name="piemonte_url_path">/italiameteo/previpiemonte.htm</string>
