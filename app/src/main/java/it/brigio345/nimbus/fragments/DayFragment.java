@@ -20,6 +20,11 @@ public class DayFragment extends Fragment {
     private static final String VENTI = "venti";
     private static final String TEMPERATURE = "temperature";
 
+    private static final String CIELO_KEY = "Cielo:";
+    private static final String PRECIPITAZIONI_KEY = "Precipitazioni:";
+    private static final String VENTI_KEY = "Venti:";
+    private static final String TEMPERATURE_KEY = "Temperature:";
+
     private String[] content;
 
     public DayFragment() {
@@ -31,15 +36,15 @@ public class DayFragment extends Fragment {
         Bundle args = new Bundle();
 
         if (content != null) {
-            String[] spl = content.split("Cielo:");
+            String[] spl = content.split(CIELO_KEY);
             if (spl.length > 1) {
-                String[] spl2 = spl[1].split("Precipitazioni:");
+                String[] spl2 = spl[1].split(PRECIPITAZIONI_KEY);
                 args.putString(CIELO, spl2[0]);
                 if (spl2.length > 1) {
-                    String[] spl3 = spl2[1].split("Venti:");
+                    String[] spl3 = spl2[1].split(VENTI_KEY);
                     args.putString(PRECIPITAZIONI, spl3[0]);
                     if (spl3.length > 1) {
-                        String[] spl4 = spl3[1].split("Temperature:");
+                        String[] spl4 = spl3[1].split(TEMPERATURE_KEY);
                         args.putString(VENTI, spl4[0]);
                         if (spl4.length > 1) {
                             args.putString(TEMPERATURE, spl4[1]);
