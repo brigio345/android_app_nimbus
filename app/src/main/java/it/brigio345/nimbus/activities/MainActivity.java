@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void showUpdateSnackbar() {
         if (dataTimestamp != null) {
-            String date = new java.text.SimpleDateFormat("dd/MM", java.util.Locale.getDefault()).format(dataTimestamp.getTime());
+            String date = new java.text.SimpleDateFormat("d/M", java.util.Locale.getDefault()).format(dataTimestamp.getTime());
             String message = getString(R.string.data_updated, date);
             Snackbar.make(findViewById(R.id.swiperefresh_main), message, Snackbar.LENGTH_LONG).show();
         }
