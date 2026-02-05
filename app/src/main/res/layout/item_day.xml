@@ -14,7 +14,7 @@
         android:layout_marginBottom="4dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        app:cardBackgroundColor="@color/md_theme_primaryContainer_mediumContrast">
+        app:cardBackgroundColor="?attr/colorPrimaryContainer">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="@color/md_theme_onPrimaryContainer_mediumContrast"
+                android:textColor="?attr/colorOnPrimaryContainer"
                 android:textIsSelectable="true" />
 
             <TextView
@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="@color/md_theme_onPrimaryContainer_mediumContrast"
+                android:textColor="?attr/colorOnPrimaryContainer"
                 android:textIsSelectable="true" />
 
         </LinearLayout>
