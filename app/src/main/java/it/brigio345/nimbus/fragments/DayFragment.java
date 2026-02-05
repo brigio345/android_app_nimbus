@@ -59,14 +59,15 @@ public class DayFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
 
-        content = new String[4];
         if (args != null) {
-            content[0] = args.getString(PRECIPITAZIONI, "");
-            content[1] = args.getString(CIELO, "");
-            content[2] = args.getString(TEMPERATURE, "");
-            content[3] = args.getString(VENTI, "");
+            content = new String[]{
+                    args.getString(PRECIPITAZIONI, ""),
+                    args.getString(CIELO, ""),
+                    args.getString(TEMPERATURE, ""),
+                    args.getString(VENTI, "")
+            };
         } else {
-            Arrays.fill(content, "");
+            content = new String[]{"", "", "", ""};
         }
     }
 
