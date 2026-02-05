@@ -35,6 +35,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import it.brigio345.nimbus.R;
 import it.brigio345.nimbus.adapters.MainPagerAdapter;
 import it.brigio345.nimbus.utils.DateConverter;
@@ -47,7 +50,8 @@ public class MainActivity extends AppCompatActivity {
     ConnectivityManager.NetworkCallback networkCallback;
     Thread download;
     private int documentHash;
-    private Calendar lastUpdateDate;
+    private Calendar lastRefresh;
+    private Calendar dataTimestamp;
 
     private class DownloadData implements Runnable {
         @Override
@@ -61,22 +65,43 @@ public class MainActivity extends AppCompatActivity {
 
                 int newDocumentHash = document.html().hashCode();
                 boolean isSameDay = false;
-                if (lastUpdateDate != null) {
-                    isSameDay = lastUpdateDate.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
-                            lastUpdateDate.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR);
+                if (lastRefresh != null) {
+                    isSameDay = lastRefresh.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+                            lastRefresh.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR);
                 }
 
                 if (pagerAdapter.getItemCount() > 0 && newDocumentHash == documentHash && isSameDay) {
-                    runOnUiThread(() -> swipeRefreshLayout.setRefreshing(false));
+                    runOnUiThread(() -> {
+                        swipeRefreshLayout.setRefreshing(false);
+                        showUpdateSnackbar();
+                    });
                     return;
                 }
                 documentHash = newDocumentHash;
-                lastUpdateDate = now;
+                lastRefresh = now;
 
                 Elements daysContent = document.getElementsByAttributeValue("class", "MsoNormal");
                 Element overviewContent = daysContent.get(0);
                 daysContent.remove(0);
                 Elements days = document.getElementsByTag("table");
+
+                dataTimestamp = null;
+                Pattern pattern = Pattern.compile("EMISSIONE BOLLETTINO:\\s+(\\w+\\s\\d{1,2}\\s[A-Z]+\\s\\d{4})", Pattern.CASE_INSENSITIVE);
+                for (Element day : days) {
+                    String text = day.text();
+                    Matcher matcher = pattern.matcher(day.text());
+
+                    if (!matcher.find())
+                        continue;
+
+                    try {
+                        dataTimestamp = DateConverter.convertDate(matcher.group(1));
+                    } catch (DateConverter.InvalidStringDateException e) {
+                        e.printStackTrace();
+                    }
+
+                    break;
+                }
 
                 Vector<GregorianCalendar> dayCalendars = new Vector<>();
                 // Remove the elements that are not actually days.
@@ -184,6 +209,14 @@ public class MainActivity extends AppCompatActivity {
         }
         download = new Thread(new DownloadData());
         download.start();
+    }
+
+    private void showUpdateSnackbar() {
+        if (dataTimestamp != null) {
+            String date = new java.text.SimpleDateFormat("dd/MM", java.util.Locale.getDefault()).format(dataTimestamp.getTime());
+            String message = getString(R.string.data_updated, date);
+            Snackbar.make(findViewById(R.id.swiperefresh_main), message, Snackbar.LENGTH_LONG).show();
+        }
     }
 
     private boolean isNetworkAvailable() {

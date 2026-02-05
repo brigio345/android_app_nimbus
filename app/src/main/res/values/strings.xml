@@ -16,4 +16,5 @@
     <string name="piemonte_url_path">/italiameteo/previpiemonte.htm</string>
     <string name="share_intro">Previsioni meteo Nimbus\nFonte: </string>
     <string name="share_closing">Applicazione sviluppata da brigio345</string>
+    <string name="data_updated">Bollettino emesso il %1$s</string>
 </resources>
