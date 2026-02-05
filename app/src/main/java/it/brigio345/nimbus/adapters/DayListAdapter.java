@@ -71,7 +71,7 @@ public class DayListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return 4;
+        return content.length;
     }
 
     @Override

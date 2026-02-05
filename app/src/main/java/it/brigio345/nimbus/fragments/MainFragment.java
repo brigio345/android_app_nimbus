@@ -32,7 +32,9 @@ public class MainFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        content = getArguments().getString(CONTENT);
+        if (getArguments() != null) {
+            content = getArguments().getString(CONTENT);
+        }
     }
 
     @Override

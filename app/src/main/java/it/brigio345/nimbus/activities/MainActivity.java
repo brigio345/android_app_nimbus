@@ -43,15 +43,15 @@ import it.brigio345.nimbus.adapters.MainPagerAdapter;
 import it.brigio345.nimbus.utils.DateConverter;
 
 public class MainActivity extends AppCompatActivity {
-    String url;
-    MainPagerAdapter pagerAdapter;
-    ViewPager2 viewPager;
-    SwipeRefreshLayout swipeRefreshLayout;
-    ConnectivityManager.NetworkCallback networkCallback;
-    Thread download;
+    private volatile String url;
+    private MainPagerAdapter pagerAdapter;
+    private ViewPager2 viewPager;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ConnectivityManager.NetworkCallback networkCallback;
+    private Thread download;
     private int documentHash;
     private Calendar lastRefresh;
-    private Calendar dataTimestamp;
+    private volatile Calendar dataTimestamp;
 
     private class DownloadData implements Runnable {
         @Override
@@ -72,7 +72,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if (pagerAdapter.getItemCount() > 0 && newDocumentHash == documentHash && isSameDay) {
                     runOnUiThread(() -> {
-                        swipeRefreshLayout.setRefreshing(false);
+                        if (swipeRefreshLayout != null) {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
                         showUpdateSnackbar();
                     });
                     return;
@@ -81,6 +83,14 @@ public class MainActivity extends AppCompatActivity {
                 lastRefresh = now;
 
                 Elements daysContent = document.getElementsByAttributeValue("class", "MsoNormal");
+                if (daysContent.isEmpty()) {
+                    runOnUiThread(() -> {
+                        if (swipeRefreshLayout != null) {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+                    return;
+                }
                 Element overviewContent = daysContent.get(0);
                 daysContent.remove(0);
                 Elements days = document.getElementsByTag("table");
@@ -126,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                     Calendar tomorrow = Calendar.getInstance();
                     tomorrow.add(Calendar.DAY_OF_YEAR, 1);
 
-                    int size = daysContent.size();
+                    int size = Math.min(daysContent.size(), dayCalendars.size());
 
                     for (int i = 0; i < size; i++) {
                         day = days.get(i).text();
@@ -153,25 +163,38 @@ public class MainActivity extends AppCompatActivity {
                         pagerAdapter.addPage(day, daysContent.get(i).wholeText(), false);
                     }
 
-                    pagerAdapter.notifyDataSetChanged();
-                    viewPager.setCurrentItem(0);
-
-                    TabLayout tabLayout = findViewById(R.id.tablayout_main);
-                    if (pagerAdapter.getItemCount() > 0) {
-                        tabLayout.setVisibility(View.VISIBLE);
-                        View loadingIndicator = findViewById(R.id.loadingindicator_main);
-                        if (loadingIndicator != null) {
-                            ((ViewGroup) loadingIndicator.getParent()).removeView(loadingIndicator);
-                        }
-                    } else {
-                        tabLayout.setVisibility(View.INVISIBLE);
+                    if (pagerAdapter != null) {
+                        pagerAdapter.notifyDataSetChanged();
+                    }
+                    if(viewPager != null){
+                        viewPager.setCurrentItem(0);
                     }
 
-                    swipeRefreshLayout.setRefreshing(false);
+
+                    TabLayout tabLayout = findViewById(R.id.tablayout_main);
+                    if (tabLayout != null) {
+                        if (pagerAdapter.getItemCount() > 0) {
+                            tabLayout.setVisibility(View.VISIBLE);
+                            View loadingIndicator = findViewById(R.id.loadingindicator_main);
+                            if (loadingIndicator != null && loadingIndicator.getParent() instanceof ViewGroup) {
+                                ((ViewGroup) loadingIndicator.getParent()).removeView(loadingIndicator);
+                            }
+                        } else {
+                            tabLayout.setVisibility(View.INVISIBLE);
+                        }
+                    }
+
+                    if (swipeRefreshLayout != null) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
                 });
             } catch (IOException e) {
                 e.printStackTrace();
-                runOnUiThread(() -> swipeRefreshLayout.setRefreshing(false));
+                runOnUiThread(() -> {
+                    if (swipeRefreshLayout != null) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
             }
         }
     }
@@ -181,16 +204,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private synchronized void startDownload(boolean waitForNetwork) {
-        if (pagerAdapter.getItemCount() > 0)
+        if (pagerAdapter != null && pagerAdapter.getItemCount() > 0 && swipeRefreshLayout != null)
             swipeRefreshLayout.setRefreshing(true);
         if (!isNetworkAvailable()) {
             Snackbar.make(findViewById(R.id.swiperefresh_main), R.string.no_connection, Snackbar.LENGTH_SHORT).show();
             if (!waitForNetwork) {
-                swipeRefreshLayout.setRefreshing(false);
+                if (swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
                 return;
             }
             final ConnectivityManager connectivityManager = (ConnectivityManager)
                     getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connectivityManager == null) {
+                return;
+            }
             networkCallback = new ConnectivityManager.NetworkCallback() {
                 @Override
                 public void onAvailable(Network network) {
@@ -241,19 +269,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+        }
 
         pagerAdapter = new MainPagerAdapter(this);
         viewPager = findViewById(R.id.viewpager_main);
-        viewPager.setAdapter(pagerAdapter);
+        if (viewPager != null) {
+            viewPager.setAdapter(pagerAdapter);
+        }
 
         TabLayout tabLayout = findViewById(R.id.tablayout_main);
-        new TabLayoutMediator(tabLayout, viewPager,
-                (tab, position) -> tab.setText(pagerAdapter.getPageTitle(position))
-        ).attach();
+        if (tabLayout != null && viewPager != null) {
+            new TabLayoutMediator(tabLayout, viewPager,
+                    (tab, position) -> tab.setText(pagerAdapter.getPageTitle(position))
+            ).attach();
+        }
 
         swipeRefreshLayout = findViewById(R.id.swiperefresh_main);
-        swipeRefreshLayout.setOnRefreshListener(this::startDownload);
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setOnRefreshListener(this::startDownload);
+        }
 
         startDownload(true);
     }
@@ -264,7 +300,9 @@ public class MainActivity extends AppCompatActivity {
         if (networkCallback != null) {
             final ConnectivityManager connectivityManager = (ConnectivityManager)
                     getSystemService(Context.CONNECTIVITY_SERVICE);
-            connectivityManager.unregisterNetworkCallback(networkCallback);
+            if (connectivityManager != null) {
+                connectivityManager.unregisterNetworkCallback(networkCallback);
+            }
         }
         if (download != null && download.isAlive()) {
             download.interrupt();
@@ -293,6 +331,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (id == R.id.item_share) {
+            if (pagerAdapter == null) {
+                return false;
+            }
             AlertDialog alert = new MaterialAlertDialogBuilder(this)
                     .setTitle(R.string.share_forecast)
                     .setMultiChoiceItems(pagerAdapter.getPageTitles(), null,
@@ -316,10 +357,12 @@ public class MainActivity extends AppCompatActivity {
                             builder.append("\n\n");
 
                             for (int it : mSelectedItems) {
-                                builder.append(pagerAdapter.getPageTitle(it));
-                                builder.append("\n\n");
-                                builder.append(pagerAdapter.getPageContent(it));
-                                builder.append("\n\n\n");
+                                if (it < pagerAdapter.getItemCount()) {
+                                    builder.append(pagerAdapter.getPageTitle(it));
+                                    builder.append("\n\n");
+                                    builder.append(pagerAdapter.getPageContent(it));
+                                    builder.append("\n\n\n");
+                                }
                             }
 
                             builder.append(getString(R.string.share_closing));
