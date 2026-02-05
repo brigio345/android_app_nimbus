@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import it.brigio345.nimbus.R;
 import it.brigio345.nimbus.adapters.DayListAdapter;
@@ -32,27 +34,22 @@ public class DayFragment extends Fragment {
     }
 
     public static DayFragment newInstance(String content) {
+        if (content == null)
+            return null;
+
+        String regex = CIELO_KEY + "(.*?)" + PRECIPITAZIONI_KEY + "(.*?)" + VENTI_KEY + "(.*?)" + TEMPERATURE_KEY + "(.*)";
+        Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(content.trim());
+
+        if (!matcher.matches())
+            return null;
+
         DayFragment fragment = new DayFragment();
         Bundle args = new Bundle();
-
-        if (content != null) {
-            String[] spl = content.split(CIELO_KEY);
-            if (spl.length > 1) {
-                String[] spl2 = spl[1].split(PRECIPITAZIONI_KEY);
-                args.putString(CIELO, spl2[0]);
-                if (spl2.length > 1) {
-                    String[] spl3 = spl2[1].split(VENTI_KEY);
-                    args.putString(PRECIPITAZIONI, spl3[0]);
-                    if (spl3.length > 1) {
-                        String[] spl4 = spl3[1].split(TEMPERATURE_KEY);
-                        args.putString(VENTI, spl4[0]);
-                        if (spl4.length > 1) {
-                            args.putString(TEMPERATURE, spl4[1]);
-                        }
-                    }
-                }
-            }
-        }
+        args.putString(CIELO, matcher.group(1).trim());
+        args.putString(PRECIPITAZIONI, matcher.group(2).trim());
+        args.putString(VENTI, matcher.group(3).trim());
+        args.putString(TEMPERATURE, matcher.group(4).trim());
         fragment.setArguments(args);
         return fragment;
     }
